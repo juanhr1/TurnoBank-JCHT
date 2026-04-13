@@ -6,13 +6,39 @@ services:
     build: ./users-service
     ports:
       - "5001:5000"
+    env_file:
+      - .env
+    depends_on:
+      - db
 
   turns-service:
     build: ./turns-service
     ports:
       - "5002:5000"
+    env_file:
+      - .env
+    depends_on:
+      - users-service
+      - notifications-service
+      - db
 
   notifications-service:
     build: ./notifications-service
     ports:
-    - "5003:5000"    
+      - "5003:5000"
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: turnos_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
