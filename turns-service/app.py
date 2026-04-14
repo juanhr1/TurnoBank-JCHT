@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
-import psycopg2
+import psycopg2 # type: ignore
 import os
 import time
 

@@ -1,59 +1,86 @@
-# Gestor de Turnos para Banco
+# Sistema de Gestión de Turnos basado en Microservicios
 
-## Descripción
+## Descripción del proyecto
 
-Este proyecto implementa un prototipo de sistema distribuido para la gestión de turnos en un banco.
-El sistema permite registrar usuarios mediante su número de identificación y teléfono, y generar turnos teniendo en cuenta la prioridad de atención (general o preferencial).
+El presente proyecto implementa un sistema de gestión de turnos utilizando una arquitectura de microservicios, en la cual cada componente del sistema funciona de manera independiente y se comunica con los demás a través de protocolos de red.
 
-La arquitectura está basada en microservicios, donde cada servicio se ejecuta en un contenedor independiente utilizando Docker.
+El sistema permite el registro de usuarios, la asignación de turnos y el envío de notificaciones. Cada una de estas funcionalidades está desacoplada en servicios independientes, lo que facilita la escalabilidad, mantenibilidad y despliegue del sistema.
 
-## Servicios implementados
+Se implementa una comunicación síncrona entre microservicios mediante el uso de HTTP, donde cada servicio realiza solicitudes a otros y espera una respuesta para continuar con su ejecución. Adicionalmente, se utiliza una base de datos relacional (PostgreSQL) para garantizar la persistencia de la información, junto con volúmenes en Docker para evitar la pérdida de datos.
 
-Servicio de usuarios: permite registrar y consultar usuarios.
-Servicio de turnos: permite generar y consultar los turnos asignados.
+El sistema está contenerizado mediante Docker y orquestado con Docker Compose, lo que permite su ejecución en diferentes entornos de manera consistente.
 
-## Tecnologías utilizadas
+## Instrucciones para la ejecución
 
-* Backend: Python (Flask)
-* Contenedores: Docker
-* Orquestación de servicios: Docker Compose
+1. Clonar el repositorio:
 
-## Estructura del proyecto
-gestor-turnos
-    users-service
-        app.py
-        Dockerfile
-        requirements.txt
+    git clone <URL_DEL_REPOSITORIO>
+    cd gestor-turnos-py
 
-    turns-service
-        app.py
-        Dockerfile
-        requirements.txt
-        
-    docker-compose.yml
+2. Crear el archivo de configuración `.env` en la raíz del proyecto:
 
-## Requisitos
-* Tener instalado Docker Desktop
-* Tener Docker Compose disponible
+    env
+        DB_HOST=db
+        DB_NAME=turnos_db
+        DB_USER=admin
+        DB_PASSWORD=admin
 
-## Cómo ejecutar el proyecto
+3. Construir y ejecutar los contenedores:
 
-1. Abrir una terminal en la carpeta del proyecto.
+    docker-compose up --build
 
-2. Ejecutar el siguiente comando:
 
-docker-compose up --build
+4. Verificar el funcionamiento de los servicios en:
 
-3. Esperar a que Docker construya y levante los servicios.
+* http://localhost:5001/users
+* http://localhost:5002/turns
+* http://localhost:5003/notifications
 
-## Cómo probar los servicios
+## Descripción de endpoints
 
-Servicio de usuarios:
+### Servicio de Usuarios
 
-http://localhost:5001/users
+* **POST /users**
+  Permite registrar un nuevo usuario en el sistema.
 
-Servicio de turnos:
+json
+    {
+    "identificacion": "123",
+    "telefono": "3001234567"
+    }
 
-http://localhost:5002/turns
 
-Si el sistema está funcionando correctamente, el navegador mostrará un mensaje indicando que el servicio está activo.
+* **GET /users**
+  Retorna la lista de usuarios registrados.
+
+### Servicio de Turnos
+
+* **POST /turn**
+  Permite crear un turno para un usuario existente. Este endpoint realiza una comunicación síncrona con el servicio de usuarios para validar la existencia del usuario antes de registrar el turno.
+
+json
+    {
+    "identificacion": "123"
+    }
+
+* **GET /turns**
+  Permite consultar los turnos almacenados en la base de datos.
+
+
+### Servicio de Notificaciones
+
+* **POST /notify**
+  Recibe solicitudes desde el servicio de turnos para simular el envío de notificaciones. Este servicio representa un comportamiento desacoplado dentro del sistema.
+
+## Consideraciones técnicas
+
+* Arquitectura basada en microservicios.
+* Comunicación síncrona mediante HTTP.
+* Persistencia de datos con PostgreSQL.
+* Uso de volúmenes en Docker para almacenamiento persistente.
+* Configuración mediante variables de entorno.
+* Contenerización con Docker y orquestación con Docker Compose.
+
+## Conclusión
+
+El sistema desarrollado evidencia la aplicación de conceptos fundamentales de sistemas distribuidos, tales como la separación de responsabilidades, comunicación entre servicios, persistencia de datos y despliegue en contenedores. Esta arquitectura permite la escalabilidad del sistema y facilita su mantenimiento y evolución.
