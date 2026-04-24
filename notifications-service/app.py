@@ -1,32 +1,81 @@
 from flask import Flask, request, jsonify
+import psycopg2 # type: ignore
+import os
+import time
 
 app = Flask(__name__)
 
-notificaciones = []
+while True:
+    try:
+        conn = psycopg2.connect(
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD")
+        )
+        print("Conectado a PostgreSQL")
+        break
+    except:
+        print("Esperando BD...")
+        time.sleep(3)
 
-# Recibir notificación
+cur = conn.cursor()
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    identificacion VARCHAR(50),
+    turno VARCHAR(20),
+    mensaje TEXT
+)
+""")
+conn.commit()
+
+
 @app.route("/notify", methods=["POST"])
 def notify():
     data = request.json
 
-    notificacion = {
-        "identificacion": data["identificacion"],
-        "turno": data["turno"],
-        "mensaje": f"Turno asignado: {data['turno']}"
-    }
+    identificacion = data["identificacion"]
+    turno = data["turno"]
+    mensaje = "Turno asignado: " + turno
 
-    notificaciones.append(notificacion)
+    cur.execute(
+        """
+        INSERT INTO notifications
+        (identificacion, turno, mensaje)
+        VALUES (%s,%s,%s)
+        """,
+        (identificacion, turno, mensaje)
+    )
 
-    print("Notificación recibida:", notificacion)
+    conn.commit()
 
-    return jsonify({"mensaje": "Notificación enviada correctamente"})
+    return jsonify({"mensaje": "Notificación guardada"})
 
-# Listar notificaciones
+
 @app.route("/notifications", methods=["GET"])
 def get_notifications():
+
+    cur.execute("""
+        SELECT identificacion, turno, mensaje
+        FROM notifications
+    """)
+
+    rows = cur.fetchall()
+
+    lista = []
+
+    for r in rows:
+        lista.append({
+            "identificacion": r[0],
+            "turno": r[1],
+            "mensaje": r[2]
+        })
+
     return jsonify({
-        "mensaje": "Listado de notificaciones",
-        "notificaciones": notificaciones
+        "notificaciones": lista
     })
+
 
 app.run(host="0.0.0.0", port=5000)
