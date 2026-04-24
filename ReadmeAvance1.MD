@@ -4,9 +4,9 @@
 
 El presente proyecto implementa un sistema de gestión de turnos utilizando una arquitectura de microservicios, en la cual cada componente del sistema funciona de manera independiente y se comunica con los demás a través de protocolos de red.
 
-El sistema permite el registro de usuarios, la asignación de turnos y el envío de notificaciones. Cada una de estas funcionalidades está desacoplada en servicios independientes, lo que facilita la escalabilidad, mantenibilidad y despliegue del sistema.
+El sistema permite el registro de usuarios, la asignación de turnos y generar notificaciones. Cada una de estas funcionalidades está desacoplada en servicios independientes, lo que facilita la escalabilidad, mantenibilidad y despliegue del sistema.
 
-Se implementa una comunicación síncrona entre microservicios mediante el uso de HTTP, donde cada servicio realiza solicitudes a otros y espera una respuesta para continuar con su ejecución. Adicionalmente, se utiliza una base de datos relacional (PostgreSQL) para garantizar la persistencia de la información, junto con volúmenes en Docker para evitar la pérdida de datos.
+Se implementa una comunicación síncrona entre microservicios mediante el uso de HTTP, donde cada servicio realiza solicitudes a otros y espera una respuesta para continuar con su ejecución. Adicionalmente, se utiliza una base de datos relacional (PostgreSQL) para garantizar la persistencia de la información, junto con volúmenes en Docker para evitar la pérdida de datos y también se implementó un API Gateway como punto único de entrada para centralizar las solicitudes del cliente.
 
 El sistema está contenerizado mediante Docker y orquestado con Docker Compose, lo que permite su ejecución en diferentes entornos de manera consistente.
 
@@ -14,11 +14,10 @@ El sistema está contenerizado mediante Docker y orquestado con Docker Compose, 
 
 1. Clonar el repositorio:
 
-    git clone <URL_DEL_REPOSITORIO>
+    git clone: https://github.com/juanhr1/Sistema-de-turnos.git
     cd gestor-turnos-py
 
 2. Crear el archivo de configuración `.env` en la raíz del proyecto:
-
     env
         DB_HOST=db
         DB_NAME=turnos_db
@@ -32,14 +31,27 @@ El sistema está contenerizado mediante Docker y orquestado con Docker Compose, 
 
 4. Verificar el funcionamiento de los servicios en:
 
+* http://localhost:5000
 * http://localhost:5001/users
 * http://localhost:5002/turns
 * http://localhost:5003/notifications
 
-## Descripción de endpoints
+## Arquitectura del sistema
 
-### Servicio de Usuarios
+El proyecto está compuesto por los siguientes servicios:
+### 1. API Gateway
+Encargado de recibir solicitudes externas y redirigirlas al servicio correcto.
+Puerto: 5000
 
+### 2. Users Service
+Gestiona la información de usuarios.
+Funciones:
+- Registrar usuarios.
+- Consultar usuarios registrados.
+
+Puerto: 5001
+
+Crear usuario
 * **POST /users**
   Permite registrar un nuevo usuario en el sistema.
 
@@ -49,12 +61,21 @@ json
     "telefono": "3001234567"
     }
 
-
+Ver usuarios
 * **GET /users**
   Retorna la lista de usuarios registrados.
 
-### Servicio de Turnos
+### 3. Turns Service
+Gestiona la lógica de turnos
+Funciones:
+- Validar usuario existente.
+- Generar turnos consecutivos.
+- Guardar turnos.
+- Enviar notificaciones.
 
+Puerto: 5002
+
+crear turno
 * **POST /turn**
   Permite crear un turno para un usuario existente. Este endpoint realiza una comunicación síncrona con el servicio de usuarios para validar la existencia del usuario antes de registrar el turno.
 
@@ -63,23 +84,86 @@ json
     "identificacion": "123"
     }
 
+Consultar turnos
 * **GET /turns**
   Permite consultar los turnos almacenados en la base de datos.
 
 
-### Servicio de Notificaciones
+### 4. Notifications Service
+Gestiona el historial de notificaciones.
+Funciones:
+- Recibir eventos de nuevos turnos.
+- Guardar mensajes.
+- Consultar historial.
 
+Puerto: 5003
+
+crear natificación manual
 * **POST /notify**
   Recibe solicitudes desde el servicio de turnos para simular el envío de notificaciones. Este servicio representa un comportamiento desacoplado dentro del sistema.
 
-## Consideraciones técnicas
+consultar natificación 
+* **GET /notifications**
 
-* Arquitectura basada en microservicios.
-* Comunicación síncrona mediante HTTP.
-* Persistencia de datos con PostgreSQL.
-* Uso de volúmenes en Docker para almacenamiento persistente.
-* Configuración mediante variables de entorno.
-* Contenerización con Docker y orquestación con Docker Compose.
+### 5. PostgreSQL
+Base de datos principal del sistema.
+Tablas:
+- users
+- turns
+- notifications
+
+## Base de datos
+Se utiliza PostgreSQL con persistencia mediante volumen Docker.
+- Conservación de datos.
+- Estructura relacional.
+- Integridad de información.
+- Soporte SQL.
+
+## Variables de entorno
+Se utilizan variables de entorno para separar configuración del código.
+- Host de base de datos
+- Usuario
+- Contraseña
+- Nombre de base de datos
+
+Esto mejora seguridad y portabilidad.
+
+## Logs y Monitoreo
+Cada servicio registra eventos en consola:
+- Solicitudes recibidas.
+- Usuarios creados.
+- Turnos asignados.
+- Notificaciones registradas.
+- Errores internos.
+
+Ver logs:
+  docker-compose logs -f
+
+## Tecnologías Utilizadas
+- Python
+- Flask
+- PostgreSQL
+- Docker
+- Docker Compose
+- Requests
+- Psycopg2
+- Postman
+
+## Conceptos aplicados
+- Microservicios
+- Comunicación distribuida
+- API Gateway
+- Persistencia
+- Contenedores
+- Escalabilidad
+- Portabilidad
+- Logs
+
+## Comando útiles
+- Detener el sistema: docker-compose down
+- Reconstruir sistema: docker-compose up --build
+- Ver contenedores activos: docker ps
+- Ver logs: docker-compose logs -f
 
 ## Conclusión
 
