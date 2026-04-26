@@ -6,7 +6,7 @@ El presente proyecto implementa un sistema de gestión de turnos utilizando una 
 
 El sistema permite el registro de usuarios, la asignación de turnos y generar notificaciones. Cada una de estas funcionalidades está desacoplada en servicios independientes, lo que facilita la escalabilidad, mantenibilidad y despliegue del sistema.
 
-Se implementa una comunicación síncrona entre microservicios mediante el uso de HTTP, donde cada servicio realiza solicitudes a otros y espera una respuesta para continuar con su ejecución. Adicionalmente, se utiliza una base de datos relacional (PostgreSQL) para garantizar la persistencia de la información, junto con volúmenes en Docker para evitar la pérdida de datos y también se implementó un API Gateway como punto único de entrada para centralizar las solicitudes del cliente.
+Se implementa una comunicación síncrona entre microservicios mediante el uso de HTTP, donde cada servicio realiza solicitudes a otros y espera una respuesta para continuar con su ejecución. Adicionalmente, se utiliza una base de datos relacional (PostgreSQL) para cada servicio siguiendo el principio de desacoplamiento y autonomía de datos, junto con volúmenes en Docker para evitar la pérdida de datos y también se implementó un API Gateway como punto único de entrada para centralizar las solicitudes del cliente.
 
 El sistema está contenerizado mediante Docker y orquestado con Docker Compose, lo que permite su ejecución en diferentes entornos de manera consistente.
 
@@ -106,11 +106,13 @@ consultar natificación
 * **GET /notifications**
 
 ### 5. PostgreSQL
-Base de datos principal del sistema.
-Tablas:
-- users
-- turns
-- notifications
+## Bases de datos por servicio
+
+- users-service → users_db
+- turns-service → turns_db
+- notifications-service → notifications_db
+
+Cada base contiene únicamente la información correspondiente a su dominio funcional.
 
 ## Base de datos
 Se utiliza PostgreSQL con persistencia mediante volumen Docker.
@@ -136,8 +138,13 @@ Cada servicio registra eventos en consola:
 - Notificaciones registradas.
 - Errores internos.
 
-Ver logs:
+Ver logs en tiempo real:
   docker-compose logs -f
+Esto facilita el seguimiento de solicitudes, errores y pruebas de disponibilidad.
+
+## Tolerancia básica a fallos
+
+Se implementaron timeouts en las comunicaciones entre servicios para evitar bloqueos cuando un microservicio no responde o se encuentra caído.
 
 ## Tecnologías Utilizadas
 - Python
