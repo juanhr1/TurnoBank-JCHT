@@ -15,6 +15,8 @@ services:
       - "5001:5000"
     env_file:
       - .env
+    environment:
+      DB_NAME: users_db
     depends_on:
       - db
 
@@ -24,10 +26,12 @@ services:
       - "5002:5000"
     env_file:
       - .env
+    environment:
+      DB_NAME: turns_db
     depends_on:
+      - db
       - users-service
       - notifications-service
-      - db
 
   notifications-service:
     build: ./notifications-service
@@ -35,6 +39,8 @@ services:
       - "5003:5000"
     env_file:
       - .env
+    environment:
+      DB_NAME: notifications_db
     depends_on:
       - db
 
@@ -45,7 +51,9 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: turnos_db
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
