@@ -8,6 +8,7 @@ services:
       - users-service
       - turns-service
       - notifications-service
+    restart: always
 
   users-service:
     build: ./users-service
@@ -19,6 +20,7 @@ services:
       DB_NAME: users_db
     depends_on:
       - db
+    restart: always
 
   turns-service:
     build: ./turns-service
@@ -32,6 +34,7 @@ services:
       - db
       - users-service
       - notifications-service
+    restart: always
 
   notifications-service:
     build: ./notifications-service
@@ -43,6 +46,7 @@ services:
       DB_NAME: notifications_db
     depends_on:
       - db
+    restart: always
 
   db:
     image: postgres:15

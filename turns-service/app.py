@@ -3,9 +3,16 @@ import psycopg2 # type: ignore
 import os
 import time
 import requests
+import logging
 
 app = Flask(__name__)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s TURNS: %(message)s"
+)
+
+# CONEXION
 while True:
     try:
         conn = psycopg2.connect(
@@ -14,15 +21,12 @@ while True:
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD")
         )
-        print("Conectado a turns_db")
+        cur = conn.cursor()
         break
     except:
-        print("Esperando base de datos...")
         time.sleep(3)
 
-cur = conn.cursor()
-
-# CREAR TABLA
+# TABLA
 cur.execute("""
 CREATE TABLE IF NOT EXISTS turns (
     id SERIAL PRIMARY KEY,
@@ -32,22 +36,31 @@ CREATE TABLE IF NOT EXISTS turns (
 """)
 conn.commit()
 
-# HOME
-@app.route("/")
-def home():
-    return jsonify({
-        "mensaje": "Turns Service activo"
-    })
+
+# GENERAR TURNO
+def generar_turno():
+
+    cur.execute(
+        "SELECT turno FROM turns ORDER BY id DESC LIMIT 1"
+    )
+
+    ultimo = cur.fetchone()
+
+    if ultimo is None:
+        return "T1"
+
+    numero = int(ultimo[0].replace("T", "")) + 1
+
+    return "T" + str(numero)
+
 
 # LISTAR TURNOS
 @app.route("/turns", methods=["GET"])
-def listar_turnos():
+def get_turns():
 
-    cur.execute("""
-        SELECT id, identificacion, turno
-        FROM turns
-        ORDER BY id ASC
-    """)
+    cur.execute(
+        "SELECT identificacion, turno FROM turns ORDER BY id"
+    )
 
     rows = cur.fetchall()
 
@@ -55,98 +68,102 @@ def listar_turnos():
 
     for r in rows:
         lista.append({
-            "id": r[0],
-            "identificacion": r[1],
-            "turno": r[2]
+            "identificacion": r[0],
+            "turno": r[1]
         })
 
-    return jsonify({
-        "mensaje": "Listado de turnos",
-        "turnos": lista
-    })
+    return jsonify({"turnos": lista})
+
 
 # CREAR TURNO
 @app.route("/turn", methods=["POST"])
-def crear_turno():
+def create_turn():
 
     data = request.json
 
-    if not data or "identificacion" not in data:
+    identificacion = data.get(
+        "identificacion", ""
+    ).strip()
+
+    # VALIDAR VACIO
+    if identificacion == "":
         return jsonify({
-            "error": "Debe enviar identificacion"
+            "error": "Identificacion requerida"
         }), 400
 
-    identificacion = data["identificacion"]
+    # VALIDAR NUMERICO
+    if not identificacion.isdigit():
+        return jsonify({
+            "error": "La identificacion debe ser numerica"
+        }), 400
 
-    # VALIDAR USUARIO CON TIMEOUT
+    # VALIDAR USUARIO EXISTE
     try:
         response = requests.get(
             "http://users-service:5000/users",
             timeout=3
         )
 
-        usuarios = response.json()["usuarios_registrados"]
+        users = response.json()["usuarios_registrados"]
 
-    except requests.exceptions.Timeout:
-        return jsonify({
-            "error": "Timeout consultando users-service"
-        }), 504
+        existe = False
+
+        for u in users:
+            if u["identificacion"] == identificacion:
+                existe = True
+                break
+
+        if not existe:
+            return jsonify({
+                "error": "Usuario no existe"
+            }), 400
 
     except:
         return jsonify({
             "error": "users-service no disponible"
         }), 500
 
-    existe = False
 
-    for u in usuarios:
-        if str(u["identificacion"]) == str(identificacion):
-            existe = True
-            break
+    # VALIDAR SI YA TIENE TURNO
+    cur.execute(
+        "SELECT * FROM turns WHERE identificacion=%s",
+        (identificacion,)
+    )
 
-    if not existe:
+    ya_tiene = cur.fetchone()
+
+    if ya_tiene:
         return jsonify({
-            "error": "Usuario no existe"
-        }), 404
+            "error": "El usuario ya tiene un turno asignado"
+        }), 400
 
-    # CONTADOR PERSISTENTE
-    cur.execute("SELECT COUNT(*) FROM turns")
-    total = cur.fetchone()[0] + 1
 
-    turno_generado = "T" + str(total)
+    # GENERAR NUEVO TURNO
+    nuevo_turno = generar_turno()
 
-    # GUARDAR TURNO
-    cur.execute("""
-        INSERT INTO turns (identificacion, turno)
-        VALUES (%s, %s)
-    """, (identificacion, turno_generado))
-
+    cur.execute(
+        "INSERT INTO turns (identificacion, turno) VALUES (%s,%s)",
+        (identificacion, nuevo_turno)
+    )
     conn.commit()
 
-    print("Turno creado:", turno_generado)
-
-    # NOTIFICACION CON TIMEOUT
+    # NOTIFICACION
     try:
         requests.post(
             "http://notifications-service:5000/notify",
             json={
                 "identificacion": identificacion,
-                "turno": turno_generado
+                "turno": nuevo_turno
             },
             timeout=3
         )
-
-    except requests.exceptions.Timeout:
-        print("Timeout en notifications-service")
-
     except:
-        print("notifications-service no disponible")
+        pass
 
     return jsonify({
-        "mensaje": "Turno creado correctamente",
         "identificacion": identificacion,
-        "turno": turno_generado
+        "turno": nuevo_turno
     })
 
-# INICIAR SERVIDOR
+
 app.run(host="0.0.0.0", port=5000)
