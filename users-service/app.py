@@ -38,24 +38,29 @@ CREATE TABLE IF NOT EXISTS users (
 conn.commit()
 
 
-
 # LISTAR USUARIOS
 @app.route("/users", methods=["GET"])
 def get_users():
 
-    cur.execute("SELECT identificacion, telefono FROM users ORDER BY id")
+    cur.execute("""
+        SELECT id, identificacion, telefono
+        FROM users
+        ORDER BY id
+    """)
+
     rows = cur.fetchall()
 
-    users = []
+    lista = []
 
     for r in rows:
-        users.append({
-            "identificacion": r[0],
-            "telefono": r[1]
+        lista.append({
+            "id": r[0],
+            "identificacion": r[1],
+            "telefono": r[2]
         })
 
     return jsonify({
-        "usuarios_registrados": users
+        "usuarios_registrados": lista
     })
 
 
@@ -65,8 +70,13 @@ def create_user():
 
     data = request.json
 
-    identificacion = data.get("identificacion", "").strip()
-    telefono = data.get("telefono", "").strip()
+    identificacion = data.get(
+        "identificacion", ""
+    ).strip()
+
+    telefono = data.get(
+        "telefono", ""
+    ).strip()
 
     # VALIDAR VACIOS
     if identificacion == "" or telefono == "":
@@ -74,7 +84,7 @@ def create_user():
             "error": "Todos los campos son obligatorios"
         }), 400
 
-    # VALIDAR NUMERICO
+    # VALIDAR NUMERICOS
     if not identificacion.isdigit():
         return jsonify({
             "error": "La identificacion debe ser numerica"
@@ -100,12 +110,20 @@ def create_user():
 
     # INSERTAR
     cur.execute(
-        "INSERT INTO users (identificacion, telefono) VALUES (%s,%s)",
+        """
+        INSERT INTO users
+        (identificacion, telefono)
+        VALUES (%s,%s)
+        """,
         (identificacion, telefono)
     )
+
     conn.commit()
 
-    logging.info("Usuario creado %s", identificacion)
+    logging.info(
+        "Usuario creado %s",
+        identificacion
+    )
 
     return jsonify({
         "mensaje": "Usuario creado correctamente"

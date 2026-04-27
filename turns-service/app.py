@@ -12,7 +12,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s TURNS: %(message)s"
 )
 
-# CONEXION
+# CONEXION CON REINTENTO
 while True:
     try:
         conn = psycopg2.connect(
@@ -22,11 +22,13 @@ while True:
             password=os.getenv("DB_PASSWORD")
         )
         cur = conn.cursor()
+        logging.info("Conectado a turns_db")
         break
     except:
+        logging.error("Esperando base de datos...")
         time.sleep(3)
 
-# TABLA
+# CREAR TABLA
 cur.execute("""
 CREATE TABLE IF NOT EXISTS turns (
     id SERIAL PRIMARY KEY,
@@ -37,7 +39,7 @@ CREATE TABLE IF NOT EXISTS turns (
 conn.commit()
 
 
-# GENERAR TURNO
+# GENERAR TURNO DESDE BD
 def generar_turno():
 
     cur.execute(
@@ -49,18 +51,21 @@ def generar_turno():
     if ultimo is None:
         return "T1"
 
-    numero = int(ultimo[0].replace("T", "")) + 1
+    numero = int(
+        ultimo[0].replace("T", "")
+    ) + 1
 
     return "T" + str(numero)
-
 
 # LISTAR TURNOS
 @app.route("/turns", methods=["GET"])
 def get_turns():
 
-    cur.execute(
-        "SELECT identificacion, turno FROM turns ORDER BY id"
-    )
+    cur.execute("""
+        SELECT id, identificacion, turno
+        FROM turns
+        ORDER BY id
+    """)
 
     rows = cur.fetchall()
 
@@ -68,14 +73,18 @@ def get_turns():
 
     for r in rows:
         lista.append({
-            "identificacion": r[0],
-            "turno": r[1]
+            "id": r[0],
+            "identificacion": r[1],
+            "turno": r[2]
         })
 
-    return jsonify({"turnos": lista})
+    return jsonify({
+        "turnos": lista
+    })
 
 
 # CREAR TURNO
+
 @app.route("/turn", methods=["POST"])
 def create_turn():
 
@@ -97,14 +106,16 @@ def create_turn():
             "error": "La identificacion debe ser numerica"
         }), 400
 
-    # VALIDAR USUARIO EXISTE
+    # VALIDAR USUARIO
     try:
         response = requests.get(
             "http://users-service:5000/users",
             timeout=3
         )
 
-        users = response.json()["usuarios_registrados"]
+        users = response.json()[
+            "usuarios_registrados"
+        ]
 
         existe = False
 
@@ -119,14 +130,20 @@ def create_turn():
             }), 400
 
     except:
+        logging.error(
+            "users-service no responde"
+        )
+
         return jsonify({
             "error": "users-service no disponible"
         }), 500
 
-
     # VALIDAR SI YA TIENE TURNO
     cur.execute(
-        "SELECT * FROM turns WHERE identificacion=%s",
+        """
+        SELECT * FROM turns
+        WHERE identificacion=%s
+        """,
         (identificacion,)
     )
 
@@ -134,35 +151,59 @@ def create_turn():
 
     if ya_tiene:
         return jsonify({
-            "error": "El usuario ya tiene un turno asignado"
+            "error":
+            "El usuario ya tiene un turno asignado"
         }), 400
 
-
-    # GENERAR NUEVO TURNO
+    # NUEVO TURNO
     nuevo_turno = generar_turno()
 
     cur.execute(
-        "INSERT INTO turns (identificacion, turno) VALUES (%s,%s)",
+        """
+        INSERT INTO turns
+        (identificacion, turno)
+        VALUES (%s,%s)
+        """,
         (identificacion, nuevo_turno)
     )
+
     conn.commit()
 
-    # NOTIFICACION
+    logging.info(
+        "Turno creado %s para %s",
+        nuevo_turno,
+        identificacion
+    )
+
+    # ENVIAR NOTIFICACION
     try:
         requests.post(
             "http://notifications-service:5000/notify",
             json={
-                "identificacion": identificacion,
-                "turno": nuevo_turno
+                "identificacion":
+                identificacion,
+                "turno":
+                nuevo_turno
             },
             timeout=3
         )
+
+        logging.info(
+            "Notificacion enviada"
+        )
+
     except:
-        pass
+        logging.error(
+            "notifications-service no responde"
+        )
 
     return jsonify({
-        "identificacion": identificacion,
-        "turno": nuevo_turno
+        "mensaje":
+        "Turno creado correctamente",
+        "identificacion":
+        identificacion,
+        "turno":
+        nuevo_turno
     })
 
 
