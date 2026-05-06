@@ -1,5 +1,5 @@
 # Laboratorio: Sistema que aprende a fallar
-## Juan Camilo Herrera Torres
+### Juan Camilo Herrera Torres
 
 # FASE 1 – OBSERVAR (sin modificar código)
 - Apagar el servicio de mascotas
