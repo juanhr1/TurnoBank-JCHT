@@ -18,5 +18,5 @@ Responder:
 
 ¿Se protege o insiste?
 
-- No tiene memoria de fallos anteriores, cada request sufre el timeout completo. 
+- El sistema inicialmente insiste en conectarse al servicio aunque esté caído, realizando varios intentos consecutivos. Después de alcanzar el límite de fallos configurado, activa el Circuit Breaker y se protege dejando de enviar solicitudes al backend. Sin embargo, el circuito no tiene recuperación automática, por lo que permanece abierto hasta reiniciar el gateway.
 
