@@ -4,11 +4,15 @@
 # FASE 1 – OBSERVAR (sin modificar código)
 - Apagar el servicio de mascotas
 
+<img width="2048" height="1224" alt="unnamed" src="https://github.com/user-attachments/assets/5c584249-3ac7-4588-86bb-79d5952b214d" />
+
 - Hacer varias peticiones al gateway
+
+<img width="2048" height="1221" alt="unnamed (1)" src="https://github.com/user-attachments/assets/c59ddddf-e299-4e74-9461-c3014bf5fae9" />
 
 - Revisar logs
 
-### Evidencias en carpeta evidencias/fase1.png ✅
+<img width="1728" height="916" alt="fase1" src="https://github.com/user-attachments/assets/76c29ebf-6f1c-4fc6-b50b-ef8e8618f7be" />
 
 Responder:
 
