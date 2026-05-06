@@ -24,3 +24,24 @@ Responder:
 
 - El sistema inicialmente insiste en conectarse al servicio aunque esté caído, realizando varios intentos consecutivos. Después de alcanzar el límite de fallos configurado, activa el Circuit Breaker y se protege dejando de enviar solicitudes al backend. Sin embargo, el circuito no tiene recuperación automática, por lo que permanece abierto hasta reiniciar el gateway.
 
+# FASE 2 – APLICAR (Extensión del Circuit Breaker)
+
+Aplicando circuit breaker a /usuarios
+
+<img width="443" height="306" alt="Cbreakerusuarios" src="https://github.com/user-attachments/assets/ad780a7b-ebc3-486e-a70c-8ecdfc68dec8" />
+
+Aplicando circuit breaker a /resumen
+
+<img width="1028" height="809" alt="image" src="https://github.com/user-attachments/assets/c99a7798-682a-40ef-b3eb-9a35b55753f0" />
+
+### ¿Cada servicio debe tener su propio contador de fallos?
+
+Sí. Cada servicio debe manejar su propio contador de fallos porque en la arquitectura de microservicios, cada servicio puede fallar de manera independiente sin afectar a otra parte del sistema. En la implementación realizada se utilizaron variables separadas para mascotas y usuarios, permitiendo controlar los errores de cada servicio individualmente.
+
+### ¿El circuito debe abrirse de forma independiente por servicio?
+
+Sí. El circuito debe abrirse de manera independiente para evitar que el fallo de un servicio afecte a los demás. De esta forma, si el servicio de mascotas presenta múltiples errores, únicamente se bloquean las solicitudes relacionadas con mascotas, mientras que usuarios continúa funcionando normalmente y visceversa.
+
+### ¿Qué pasa si falla un servicio pero el otro sigue funcionando?
+
+El sistema continúa respondiendo parcialmente. Por ejemplo, si el servicio de mascotas falla pero el de usuarios sigue activo, el endpoint /usuarios continúa funcionando y /resumen puede seguir mostrando la información de usuarios mientras reporta un error únicamente en la sección de mascotas. Esto mejora la tolerancia a fallos y evita que todo el sistema deje de funcionar por un solo servicio caído.
