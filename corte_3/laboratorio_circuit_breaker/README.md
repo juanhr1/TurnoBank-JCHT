@@ -50,11 +50,12 @@ El sistema continúa respondiendo parcialmente. Por ejemplo, si el servicio de m
 
 ### ¿Qué significa “half-open”?
 
-
+El estado “half-open” es una etapa intermedia del Circuit Breaker. Se utiliza después de que el circuito ha permanecido abierto durante un tiempo determinado. Es en este estado el sistema permite realizar una nueva solicitud de prueba al servicio para verificar si ya se recuperó.
 
 ### ¿Cuándo se vuelve a intentar una llamada?
 
-
+La llamada se vuelve a intentar después de un tiempo de espera configurado por el sistema. Este tiempo evita realizar intentos constantes mientras el servicio continúa caído.
 
 ### ¿Qué pasa si el servicio vuelve a fallar?
 
+Si el servicio vuelve a fallar durante el estado half-open, el circuito se abre nuevamente y se bloquean otra vez las solicitudes al servicio. Si la petición funciona correctamente, el circuito se cierra y el sistema vuelve a operar normalmente.
