@@ -45,3 +45,16 @@ Sí. El circuito debe abrirse de manera independiente para evitar que el fallo d
 ### ¿Qué pasa si falla un servicio pero el otro sigue funcionando?
 
 El sistema continúa respondiendo parcialmente. Por ejemplo, si el servicio de mascotas falla pero el de usuarios sigue activo, el endpoint /usuarios continúa funcionando y /resumen puede seguir mostrando la información de usuarios mientras reporta un error únicamente en la sección de mascotas. Esto mejora la tolerancia a fallos y evita que todo el sistema deje de funcionar por un solo servicio caído.
+
+# FASE 3 – INVESTIGAR (Half-Open)
+
+### ¿Qué significa “half-open”?
+
+
+
+### ¿Cuándo se vuelve a intentar una llamada?
+
+
+
+### ¿Qué pasa si el servicio vuelve a fallar?
+
