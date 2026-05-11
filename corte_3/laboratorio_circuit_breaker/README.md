@@ -59,3 +59,27 @@ La llamada se vuelve a intentar después de un tiempo de espera configurado por 
 ### ¿Qué pasa si el servicio vuelve a fallar?
 
 Si el servicio vuelve a fallar durante el estado half-open, el circuito se abre nuevamente y se bloquean otra vez las solicitudes al servicio. Si la petición funciona correctamente, el circuito se cierra y el sistema vuelve a operar normalmente.
+
+# FASE 4 – IMPLEMENTAR (Recuperación)
+
+Se implementa tiempo de espera definido y validaciones por mediante if y cambios en los endpoints
+
+## Para el endpoint de mascotas:
+
+Importar tiempo
+
+<img width="1019" height="577" alt="Captura de pantalla 2026-05-10 220230" src="https://github.com/user-attachments/assets/de987bc8-ba65-43bd-af91-f0335c2ed2e4" />
+
+Importar más variables globales necesarias
+
+<img width="524" height="54" alt="Captura de pantalla 2026-05-10 220508" src="https://github.com/user-attachments/assets/c7507093-1b3a-483d-892a-940901f84d2a" />
+
+<img width="499" height="158" alt="Captura de pantalla 2026-05-10 223302" src="https://github.com/user-attachments/assets/8c1ee1aa-ec13-4a1b-9744-e5cede05d5cd" />
+
+<img width="432" height="145" alt="Captura de pantalla 2026-05-10 223329" src="https://github.com/user-attachments/assets/ff89725d-4761-4a25-bd91-1bbe99aca63f" />
+
+<img width="426" height="206" alt="image" src="https://github.com/user-attachments/assets/30cfc4c6-3120-4492-8dbc-66826f068a1c" />
+
+Pruebas funcionales
+
+<img width="526" height="239" alt="Captura de pantalla 2026-05-10 222206" src="https://github.com/user-attachments/assets/f2aa66f9-3096-4d38-8aff-fc049677e305" />
