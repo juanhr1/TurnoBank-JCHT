@@ -183,11 +183,11 @@ Después del tiempo de espera configurado, ambos servicios pasaron al estado HAL
 
 Mascotas
 
-<img width="481" height="183" alt="image" src="https://github.com/user-attachments/assets/154691ca-8d85-4d17-87ce-21a191b2560e" />
+<img width="474" height="201" alt="image" src="https://github.com/user-attachments/assets/4d794a0f-663d-4228-84af-1085ea2eebb0" />
 
 Usuarios
 
-<img width="474" height="201" alt="image" src="https://github.com/user-attachments/assets/4d794a0f-663d-4228-84af-1085ea2eebb0" />
+<img width="481" height="183" alt="image" src="https://github.com/user-attachments/assets/154691ca-8d85-4d17-87ce-21a191b2560e" />
 
 Cuando los servicios volvieron a estar disponibles:
 
