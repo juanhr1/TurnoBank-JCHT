@@ -169,7 +169,7 @@ Si la prueba realizada en HALF-OPEN falla, el sistema vuelve automáticamente al
 
 Pruebas funcionales
 
-<img width="472" height="185" alt="Captura de pantalla 2026-05-11 213002" src="https://github.com/user-attachments/assets/91b9ec12-6dc1-47df-b809-cf7e0040ec6c" />
+<img width="466" height="242" alt="image" src="https://github.com/user-attachments/assets/ef2423bc-1d9d-4f99-a9ea-aff46907da1f" />
 
 # FASE 5 – VALIDAR
 
@@ -197,13 +197,15 @@ Después de varios fallos consecutivos:
 
 El circuito de mascotas pasó a OPEN
 
-<img width="485" height="156" alt="image" src="https://github.com/user-attachments/assets/807faf00-16eb-4537-ae58-ef405a6e2b5e" />
+<img width="472" height="239" alt="Captura de pantalla 2026-05-12 165115" src="https://github.com/user-attachments/assets/05ace28a-46ac-461f-8d7a-2b74f648398e" />
 
 Posteriormente se realizó la misma validación para usuarios.
 
 <img width="316" height="311" alt="image" src="https://github.com/user-attachments/assets/cd7938e3-b493-4793-96e0-daf65f90c2b4" />
 
-<img width="479" height="164" alt="image" src="https://github.com/user-attachments/assets/32782841-f76b-4ab4-858d-deb88e189461" />
+Usuarios
+
+<img width="466" height="242" alt="image" src="https://github.com/user-attachments/assets/63b1a109-9fbe-4521-923f-239e202cc08d" />
 
 Una vez abierto el circuito, el gateway dejó de enviar solicitudes al servicio caído y respondió inmediatamente con mensajes de error controlados, evitando tiempos de espera innecesarios.
 
@@ -217,7 +219,7 @@ Mascotas
 
 Usuarios
 
-<img width="481" height="183" alt="image" src="https://github.com/user-attachments/assets/154691ca-8d85-4d17-87ce-21a191b2560e" />
+<img width="466" height="242" alt="image" src="https://github.com/user-attachments/assets/a06e9165-3b3f-4251-af54-0a6b28e71989" />
 
 Cuando los servicios volvieron a estar disponibles:
 
