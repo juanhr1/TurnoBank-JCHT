@@ -28,11 +28,39 @@ Responder:
 
 Aplicando circuit breaker a /usuarios
 
+Se agregaron variables globales independientes para manejar el contador de fallos y el estado del circuito del servicio de usuarios. El sistema ahora puede detectar múltiples errores consecutivos y abrir automáticamente el circuito cuando se alcanza el límite de fallos configurado.
+
+Cuando el circuito se encuentra abierto, el gateway deja de enviar solicitudes al servicio y responde inmediatamente con un error controlado, evitando tiempos de espera innecesarios y protegiendo el sistema de intentos repetitivos hacia un servicio caído.
+
 <img width="443" height="306" alt="Cbreakerusuarios" src="https://github.com/user-attachments/assets/ad780a7b-ebc3-486e-a70c-8ecdfc68dec8" />
 
 Aplicando circuit breaker a /resumen
 
+Se implementó una validación independiente para los servicios de usuarios y mascotas, permitiendo que cada uno maneje sus propios fallos y estados del circuito.
+
+Cuando uno de los servicios falla, el endpoint /resumen continúa respondiendo con la información disponible del otro servicio, mostrando únicamente un mensaje de error en el servicio afectado.
+
+Con esta implementación se logró que el sistema tuviera mayor tolerancia a fallos, evitando que la caída de un solo servicio afectara completamente el funcionamiento del endpoint /resumen.
+
 <img width="1028" height="809" alt="image" src="https://github.com/user-attachments/assets/c99a7798-682a-40ef-b3eb-9a35b55753f0" />
+
+## Validación de circuit breaker para /resumen
+
+Endpoint que entrega toda la información
+
+<img width="158" height="424" alt="image" src="https://github.com/user-attachments/assets/6560d5b9-5605-4e61-a043-8bb119156224" />
+
+Se tumba servicio de mascotas, sin embargo, sigue mostrándose información del servicio de usuarios , por tanto, cumple.
+
+<img width="204" height="263" alt="image" src="https://github.com/user-attachments/assets/0120c85d-efe1-445b-bd18-b71cd1d44b4e" />
+
+Se tumba servicio de usuarios, sin embargo, sigue mostrándose información del servicio de mascotas, por tanto, cumple.
+
+<img width="211" height="341" alt="image" src="https://github.com/user-attachments/assets/77313589-9627-4b33-80b8-2248987a4c01" />
+
+Se tumban mutuamente, por tanto, ninguno muestra información.
+
+<img width="219" height="188" alt="image" src="https://github.com/user-attachments/assets/adb47aca-7d4b-4766-8d28-a8ec4c605605" />
 
 ### ¿Cada servicio debe tener su propio contador de fallos?
 
