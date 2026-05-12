@@ -131,7 +131,7 @@ Además, cuando el número de fallos alcanza el límite configurado, el Circuit 
 
 Pruebas funcionales
 
-<img width="526" height="239" alt="Captura de pantalla 2026-05-10 222206" src="https://github.com/user-attachments/assets/f2aa66f9-3096-4d38-8aff-fc049677e305" />
+<img width="472" height="239" alt="image" src="https://github.com/user-attachments/assets/3dc14231-75be-41e4-8b24-2ae7233e48f5" />
 
 ## Para el endpoint de usuarios:
 
@@ -213,7 +213,7 @@ Después del tiempo de espera configurado, ambos servicios pasaron al estado HAL
 
 Mascotas
 
-<img width="474" height="201" alt="image" src="https://github.com/user-attachments/assets/4d794a0f-663d-4228-84af-1085ea2eebb0" />
+<img width="472" height="239" alt="image" src="https://github.com/user-attachments/assets/7fbcab7c-c04e-404a-988d-34b6902d1643" />
 
 Usuarios
 
