@@ -195,3 +195,33 @@ Cuando los servicios volvieron a estar disponibles:
 
 los circuitos regresaron automáticamente al estado CLOSED,
 y el sistema volvió a responder normalmente.
+
+# ANÁLISIS FINAL
+## ¿Qué cambió en el comportamiento del sistema?
+
+Inicialmente el gateway seguía intentando conectarse continuamente a los servicios aunque estuvieran caídos, generando múltiples errores y tiempos de espera.
+
+Después de implementar el Circuit Breaker, el sistema comenzó a detectar fallos consecutivos y bloquear temporalmente las solicitudes hacia los servicios afectados.
+
+La lógica del Circuit Breaker fue aplicada a los diferentes endpoints del gateway, permitiendo manejar de manera más segura las conexiones hacia los servicios de mascotas, usuarios y el endpoint de resumen que muestra todos los datos.
+
+Además, con la implementación del estado HALF-OPEN, el sistema ahora puede recuperarse automáticamente cuando un servicio vuelve a estar disponible, realizando una nueva petición de prueba después de un tiempo de espera configurado.
+
+## ¿Qué decisiones tomaron en la implementación?
+
+Se decidió implementar circuitos independientes para los servicios de mascotas y usuarios, utilizando variables globales separadas para manejar los estados y contadores de fallos de cada uno.
+
+También se implementó un tiempo de espera para permitir reintentos controlados mediante el estado HALF-OPEN.
+
+Se aplicó la lógica del Circuit Breaker a los diferentes endpoints del gateway para mejorar la tolerancia a fallos y evitar que un servicio caído afectara completamente el funcionamiento del sistema, así cumpliendo la teoría y fundamentos de los sistemas distribuidos.
+
+## ¿Qué dificultades encontraron?
+
+Las principales dificultades fueron:
+
+- Manejar correctamente los estados CLOSED, OPEN y HALF-OPEN.
+- Controlar los tiempos de recuperación.
+- Implementar la recuperación automática.
+- Evitar errores internos al trabajar con variables globales y manejo de excepciones.
+
+También fue necesario adaptar la lógica del Circuit Breaker a múltiples endpoints manteniendo circuitos independientes para cada servicio.
