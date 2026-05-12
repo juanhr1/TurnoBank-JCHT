@@ -173,6 +173,8 @@ El circuito de mascotas pasó a OPEN
 
 Posteriormente se realizó la misma validación para usuarios.
 
+<img width="316" height="311" alt="image" src="https://github.com/user-attachments/assets/cd7938e3-b493-4793-96e0-daf65f90c2b4" />
+
 <img width="479" height="164" alt="image" src="https://github.com/user-attachments/assets/32782841-f76b-4ab4-858d-deb88e189461" />
 
 Una vez abierto el circuito, el gateway dejó de enviar solicitudes al servicio caído y respondió inmediatamente con mensajes de error controlados, evitando tiempos de espera innecesarios.
