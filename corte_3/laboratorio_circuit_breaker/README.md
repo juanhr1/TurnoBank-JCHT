@@ -142,3 +142,52 @@ Si la prueba realizada en HALF-OPEN falla, el sistema vuelve automáticamente al
 Pruebas funcionales
 
 <img width="472" height="185" alt="Captura de pantalla 2026-05-11 213002" src="https://github.com/user-attachments/assets/91b9ec12-6dc1-47df-b809-cf7e0040ec6c" />
+
+# FASE 5 – VALIDAR
+
+## Escenario 1 – Servicios funcionando
+
+Se realizaron peticiones a los endpoints /mascotas y /usuarios con ambos servicios activos. El sistema respondió correctamente y los circuitos permanecieron en estado CLOSED.
+
+<img width="949" height="539" alt="image" src="https://github.com/user-attachments/assets/25dd74be-0f98-45e5-859a-1a9863105a04" />
+
+<img width="374" height="281" alt="image" src="https://github.com/user-attachments/assets/d5ca8f12-38bc-43a5-bb59-dfa603a01e83" />
+
+<img width="374" height="206" alt="image" src="https://github.com/user-attachments/assets/7eb84004-06a6-4b53-8764-54732f9f1b58" />
+
+<img width="479" height="43" alt="image" src="https://github.com/user-attachments/assets/c183a579-530f-47e4-99d1-3d9858f66572" />
+
+## Escenario 2 – Servicio caído
+
+Se apagó cada servicio individualmente para verificar el comportamiento del Circuit Breaker.
+
+<img width="322" height="319" alt="image" src="https://github.com/user-attachments/assets/70bc3814-183b-4413-b5c7-59aee7515c3f" />
+
+Después de varios fallos consecutivos:
+
+El circuito de mascotas pasó a OPEN
+
+<img width="485" height="156" alt="image" src="https://github.com/user-attachments/assets/807faf00-16eb-4537-ae58-ef405a6e2b5e" />
+
+Posteriormente se realizó la misma validación para usuarios.
+
+<img width="479" height="164" alt="image" src="https://github.com/user-attachments/assets/32782841-f76b-4ab4-858d-deb88e189461" />
+
+Una vez abierto el circuito, el gateway dejó de enviar solicitudes al servicio caído y respondió inmediatamente con mensajes de error controlados, evitando tiempos de espera innecesarios.
+
+## Escenario 4 – Recuperación del servicio
+
+Después del tiempo de espera configurado, ambos servicios pasaron al estado HALF-OPEN y realizaron nuevas pruebas de conexión.
+
+Mascotas
+
+<img width="481" height="183" alt="image" src="https://github.com/user-attachments/assets/154691ca-8d85-4d17-87ce-21a191b2560e" />
+
+Usuarios
+
+<img width="474" height="201" alt="image" src="https://github.com/user-attachments/assets/4d794a0f-663d-4228-84af-1085ea2eebb0" />
+
+Cuando los servicios volvieron a estar disponibles:
+
+los circuitos regresaron automáticamente al estado CLOSED,
+y el sistema volvió a responder normalmente.
