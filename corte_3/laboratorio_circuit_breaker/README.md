@@ -96,7 +96,7 @@ Se implementa tiempo de espera definido y validaciones por mediante if y cambios
 
 Importar tiempo
 
-<img width="1019" height="577" alt="Captura de pantalla 2026-05-10 220230" src="https://github.com/user-attachments/assets/de987bc8-ba65-43bd-af91-f0335c2ed2e4" />
+<img width="91" height="16" alt="image" src="https://github.com/user-attachments/assets/7dc56f2f-728e-4b84-b31c-622b7f87418a" />
 
 Se importan más variables globales necesarias
 
