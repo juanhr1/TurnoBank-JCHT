@@ -155,6 +155,8 @@ Se realizaron peticiones a los endpoints /mascotas y /usuarios con ambos servici
 
 <img width="374" height="206" alt="image" src="https://github.com/user-attachments/assets/7eb84004-06a6-4b53-8764-54732f9f1b58" />
 
+<img width="481" height="28" alt="image" src="https://github.com/user-attachments/assets/5921f5e1-0478-4b0a-a350-3eb0b660aefd" />
+
 <img width="479" height="43" alt="image" src="https://github.com/user-attachments/assets/c183a579-530f-47e4-99d1-3d9858f66572" />
 
 ## Escenario 2 – Servicio caído
