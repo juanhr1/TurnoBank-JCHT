@@ -70,16 +70,75 @@ Importar tiempo
 
 <img width="1019" height="577" alt="Captura de pantalla 2026-05-10 220230" src="https://github.com/user-attachments/assets/de987bc8-ba65-43bd-af91-f0335c2ed2e4" />
 
-Importar más variables globales necesarias
+Se importan más variables globales necesarias
 
 <img width="524" height="54" alt="Captura de pantalla 2026-05-10 220508" src="https://github.com/user-attachments/assets/c7507093-1b3a-483d-892a-940901f84d2a" />
 
+Se hace la validación inicial del endpoint /mascotas. Cuando el circuito se encuentra abierto con un circuito_abierto = True, el sistema verifica cuánto tiempo ha pasado desde que ocurrió la apertura utilizando time.time() y la variable tiempo_apertura_mascotas.
+
+Si todavía no se cumple el tiempo de espera configurado, el gateway bloquea inmediatamente la solicitud y responde con el mensaje "Circuito abierto" evitando seguir intentando conexiones innecesarias al servicio caído.
+
 <img width="499" height="158" alt="Captura de pantalla 2026-05-10 223302" src="https://github.com/user-attachments/assets/8c1ee1aa-ec13-4a1b-9744-e5cede05d5cd" />
 
+Aquí está un try, donde el gateway intenta conectarse nuevamente al servicio de mascotas.
+Donde si la petición funciona correctamente:
+
+El contador de fallos se reinicia, el circuito vuelve al estado CLOSED y el sistema imprime "Circuito cerrado" indicando que el servicio se recuperó exitosamente.
+
+Esta es la creación del proceso de recuperación automática después del estado HALF-OPEN.
+
 <img width="432" height="145" alt="Captura de pantalla 2026-05-10 223329" src="https://github.com/user-attachments/assets/ff89725d-4761-4a25-bd91-1bbe99aca63f" />
+
+Vemos aquí el bloque except, seguido del try, encargado de manejar los errores cuando el servicio de mascotas falla.
+
+El sistema incrementa el contador de fallos y verifica si el circuito se encontraba en estado HALF-OPEN.
+
+Entramos al manejo de errores y reapertura del circuito donde: Si la prueba de recuperación falla:
+
+El circuito vuelve al estado OPEN, se guarda nuevamente el tiempo de apertura y se imprime el mensaje "HALF-OPEN falló por tanto se abre el circuito".
+
+Además, cuando el número de fallos alcanza el límite configurado, el Circuit Breaker abre nuevamente el circuito para proteger el sistema y evitar seguir enviando solicitudes al servicio caído.
 
 <img width="426" height="206" alt="image" src="https://github.com/user-attachments/assets/30cfc4c6-3120-4492-8dbc-66826f068a1c" />
 
 Pruebas funcionales
 
 <img width="526" height="239" alt="Captura de pantalla 2026-05-10 222206" src="https://github.com/user-attachments/assets/f2aa66f9-3096-4d38-8aff-fc049677e305" />
+
+## Para el endpoint de usuarios:
+
+En esta parte se implementaron nuevas variables globales para el endpoint /usuarios, permitiendo manejar de forma independiente el Circuit Breaker del servicio de usuarios.
+
+Se agregó un estado inicial llamado CLOSED, el cual representa el funcionamiento normal del servicio, y una variable encargada de almacenar el tiempo en el que el circuito se abre. Estas variables fueron necesarias para poder implementar posteriormente la lógica de recuperación automática mediante el estado HALF-OPEN.
+
+<img width="198" height="38" alt="Captura de pantalla 2026-05-11 211735" src="https://github.com/user-attachments/assets/27c987eb-de8b-4e44-8048-61f1b54bf675" />
+
+Importar más variables globales necesarias
+
+<img width="518" height="49" alt="Captura de pantalla 2026-05-11 211816" src="https://github.com/user-attachments/assets/72df90f6-8a26-4f0c-b342-adcef784b03f" />
+
+En esta sección se implementó la lógica encargada de verificar si el circuito del servicio de usuarios se encuentra abierto.
+
+También se agregó un tiempo de espera utilizando time.time(), permitiendo que el sistema pueda calcular cuándo debe volver a intentar una conexión al servicio.
+
+Cuando el tiempo configurado se cumple, el circuito cambia temporalmente al estado HALF-OPEN y el gateway permite realizar una nueva petición de prueba para comprobar si el servicio ya se recuperó.
+
+Si el tiempo aún no se cumple, el sistema mantiene el circuito abierto y responde inmediatamente con un error controlado.
+
+<img width="514" height="166" alt="Captura de pantalla 2026-05-11 213917" src="https://github.com/user-attachments/assets/e3346007-d478-4378-94e6-8486c8144727" />
+
+En esta parte se implementó la lógica principal de recuperación automática y manejo de errores para el servicio de usuarios.
+
+Dentro del bloque try, se configuró el sistema para que, cuando la petición al servicio funciona correctamente, el contador de fallos vuelva a cero y el circuito regrese nuevamente al estado CLOSED, indicando que el servicio ya se recuperó.
+
+Por otro lado, dentro del bloque except, se implementó el incremento del contador de fallos y la validación del estado HALF-OPEN.
+
+Si la prueba realizada en HALF-OPEN falla, el sistema vuelve automáticamente al estado OPEN, guarda nuevamente el tiempo de apertura y bloquea temporalmente las solicitudes al servicio para proteger el gateway de intentos innecesarios.
+
+<img width="438" height="255" alt="Captura de pantalla 2026-05-11 212304" src="https://github.com/user-attachments/assets/5576de79-30f4-4e58-bcdb-12b51e53bd93" />
+
+<img width="362" height="82" alt="Captura de pantalla 2026-05-11 212455" src="https://github.com/user-attachments/assets/033e55f9-7277-49a4-afa8-c00698d815e8" />
+
+Pruebas funcionales
+
+<img width="472" height="185" alt="Captura de pantalla 2026-05-11 213002" src="https://github.com/user-attachments/assets/91b9ec12-6dc1-47df-b809-cf7e0040ec6c" />
