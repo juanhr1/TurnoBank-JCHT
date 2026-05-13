@@ -153,7 +153,7 @@ Cuando el tiempo configurado se cumple, el circuito cambia temporalmente al esta
 
 Si el tiempo aún no se cumple, el sistema mantiene el circuito abierto y responde inmediatamente con un error controlado.
 
-<img width="514" height="166" alt="Captura de pantalla 2026-05-11 213917" src="https://github.com/user-attachments/assets/e3346007-d478-4378-94e6-8486c8144727" />
+<img width="529" height="193" alt="image" src="https://github.com/user-attachments/assets/3ab56402-3c23-454c-bab2-1175d26ecad5" />
 
 En esta parte se implementó la lógica principal de recuperación automática y manejo de errores para el servicio de usuarios.
 
@@ -163,9 +163,7 @@ Por otro lado, dentro del bloque except, se implementó el incremento del contad
 
 Si la prueba realizada en HALF-OPEN falla, el sistema vuelve automáticamente al estado OPEN, guarda nuevamente el tiempo de apertura y bloquea temporalmente las solicitudes al servicio para proteger el gateway de intentos innecesarios.
 
-<img width="438" height="255" alt="Captura de pantalla 2026-05-11 212304" src="https://github.com/user-attachments/assets/5576de79-30f4-4e58-bcdb-12b51e53bd93" />
-
-<img width="362" height="82" alt="Captura de pantalla 2026-05-11 212455" src="https://github.com/user-attachments/assets/033e55f9-7277-49a4-afa8-c00698d815e8" />
+<img width="566" height="404" alt="image" src="https://github.com/user-attachments/assets/5c1d00c4-4acd-4ee9-b030-5ebfe28ee8bb" />
 
 Pruebas funcionales
 
