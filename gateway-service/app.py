@@ -41,27 +41,36 @@ def get_users():
         else:
             print("Circuito users abierto → bloqueando llamadas", flush=True)
             print("Esperando reconexión users... reintento en 10 segundos", flush=True)
-            return jsonify({
-                "error": "Circuito users abierto"
-            }), 503
+            return jsonify({"error": "Circuito users abierto"}), 503
 
     try:
-        response = requests.get(
-            "http://users-service:5000/users",
-            timeout=TIMEOUT
-        )
-
+        response = requests.get("http://users-service:5000/users", timeout=TIMEOUT)
+        fallos_users = 0
+        if estado_users == "HALF-OPEN":
+            print("Servicio users recuperado, se cierra el circuito", flush=True)
+        else:
+            print("Circuito cerrado en el servicio de usuarios", flush=True)
+        circuito_users = False
+        estado_users = "CLOSED"
         return jsonify(response.json())
 
-    except requests.exceptions.Timeout:
-        return jsonify({
-            "error": "Timeout en users-service"
-        }), 504
-
     except:
-        return jsonify({
-            "error": "users-service no disponible"
-        }), 500
+        fallos_users += 1
+        print(f"Fallo users número {fallos_users}", flush=True)
+        if estado_users == "HALF-OPEN":
+            circuito_users = True
+            estado_users = "OPEN"
+            tiempo_apertura_users = time.time()
+            print("HALF-OPEN de users falló, por tanto se reabre el circuito", flush=True)
+            return jsonify({"error": "users-service no disponible"}), 503
+
+        if fallos_users >= 3:
+            circuito_users = True
+            estado_users = "OPEN"
+            tiempo_apertura_users = time.time()
+            print("Circuito users abierto → servicio no disponible temporalmente", flush=True)
+
+        return jsonify({"error": "users-service no disponible"}), 503
 
 
 # USERS - POST
