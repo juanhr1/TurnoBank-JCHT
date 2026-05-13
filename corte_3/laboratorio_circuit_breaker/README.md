@@ -106,7 +106,7 @@ Se hace la validación inicial del endpoint /mascotas. Cuando el circuito se enc
 
 Si todavía no se cumple el tiempo de espera configurado, el gateway bloquea inmediatamente la solicitud y responde con el mensaje "Circuito abierto" evitando seguir intentando conexiones innecesarias al servicio caído.
 
-<img width="499" height="158" alt="Captura de pantalla 2026-05-10 223302" src="https://github.com/user-attachments/assets/8c1ee1aa-ec13-4a1b-9744-e5cede05d5cd" />
+<img width="542" height="190" alt="image" src="https://github.com/user-attachments/assets/588a1395-b5ae-4334-a4a5-eb00229acdff" />
 
 Aquí está un try, donde el gateway intenta conectarse nuevamente al servicio de mascotas.
 Donde si la petición funciona correctamente:
@@ -115,7 +115,7 @@ El contador de fallos se reinicia, el circuito vuelve al estado CLOSED y el sist
 
 Esta es la creación del proceso de recuperación automática después del estado HALF-OPEN.
 
-<img width="432" height="145" alt="Captura de pantalla 2026-05-10 223329" src="https://github.com/user-attachments/assets/ff89725d-4761-4a25-bd91-1bbe99aca63f" />
+<img width="463" height="208" alt="image" src="https://github.com/user-attachments/assets/325114b6-6790-4b78-835a-63d0f68d4086" />
 
 Vemos aquí el bloque except, seguido del try, encargado de manejar los errores cuando el servicio de mascotas falla.
 
@@ -127,7 +127,7 @@ El circuito vuelve al estado OPEN, se guarda nuevamente el tiempo de apertura y 
 
 Además, cuando el número de fallos alcanza el límite configurado, el Circuit Breaker abre nuevamente el circuito para proteger el sistema y evitar seguir enviando solicitudes al servicio caído.
 
-<img width="426" height="206" alt="image" src="https://github.com/user-attachments/assets/30cfc4c6-3120-4492-8dbc-66826f068a1c" />
+<img width="512" height="211" alt="image" src="https://github.com/user-attachments/assets/64e3486f-28e7-427a-99c8-9499400b9b0a" />
 
 Pruebas funcionales
 
