@@ -78,6 +78,11 @@ def create_user():
             }), 400
     identificacion = str(data["identificacion"])
     telefono = str(data["telefono"])
+    if not identificacion.isdigit():
+        return jsonify({
+            "error": "Dato inválido",
+            "detalle": "La identificación debe ser un únicamente numérica"
+            }), 400
     cur.execute("""
         SELECT * FROM users
         WHERE identificacion = %s
