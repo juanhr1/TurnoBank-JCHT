@@ -8,11 +8,8 @@ TIMEOUT = 3
 
 fallos_users = 0
 circuito_users = False
-
 estado_users = "CLOSED"
-
 tiempo_apertura_users = 0
-
 tiempo_espera = 10
 
 @app.route("/")
@@ -135,8 +132,6 @@ def get_turns():
             "error": "turns-service no disponible"
         }), 500
 
-
-# TURNS - POST
 @app.route("/turn", methods=["POST"])
 def create_turn():
 
@@ -161,8 +156,6 @@ def create_turn():
             "error": "turns-service no disponible"
         }), 500
 
-
-# NOTIFICATIONS - GET
 @app.route("/notifications", methods=["GET"])
 def get_notifications():
 
@@ -184,8 +177,6 @@ def get_notifications():
             "error": "notifications-service no disponible"
         }), 500
 
-
-# NOTIFICATIONS - POST
 @app.route("/notify", methods=["POST"])
 def send_notification():
 
@@ -210,6 +201,25 @@ def send_notification():
             "error": "notifications-service no disponible"
         }), 500
 
+@app.route("/estado/users")
+def estado_users_service():
+    global fallos_users
+    inicio = time.time()
+    print("[MONITOREO] Consultando estado del servicio de usuarios", flush=True)
+    try:
+        response = requests.get("http://users-service:5000/health", timeout=2)
+        fin = time.time()
+        print("[MONITOREO] Servicio de usuarios funcionando correctamente - 200", flush=True)
+        print(f"[INFO] Tiempo estado users: {fin-inicio}", flush=True)
+        return jsonify(response.json())
+
+    except:
+        fallos_users += 1
+        print(f"[ERROR] Estado del servicio de usuarios -> no disponible - fallos: {fallos_users}", flush=True)
+        return jsonify({
+            "status": "down",
+            "fallos": fallos_users
+        }), 503
 
 # INICIAR APP
 app.run(host="0.0.0.0", port=5000)
