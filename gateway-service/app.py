@@ -15,7 +15,6 @@ tiempo_apertura_users = 0
 
 tiempo_espera = 10
 
-# HOME
 @app.route("/")
 def home():
     return jsonify({
@@ -75,34 +74,46 @@ def get_users():
 
         return jsonify({"error": "users-service no disponible"}), 503
 
-
-# USERS - POST
 @app.route("/users", methods=["POST"])
 def create_user():
-
+    global fallos_users, circuito_users, estado_users, tiempo_apertura_users
+    inicio = time.time()
+    print("[GATEWAY] Creando usuario", flush=True)
+    if circuito_users:
+        tiempo_actual = time.time()
+        if tiempo_actual - tiempo_apertura_users >= tiempo_espera:
+            estado_users = "HALF-OPEN"
+            circuito_users = False
+            print("Servicio de usuarios en estado HALF-OPEN → probando reconexión", flush=True)
+        else:
+            print("Circuito users abierto -> bloqueando llamadas", flush=True)
+            print("Esperando reconexión del servicio de usuarios... reintento en 10 segundos", flush=True)
+            return jsonify({"error": "Circuito users abierto"}), 503
     try:
         data = request.json
-
-        response = requests.post(
-            "http://users-service:5000/users",
-            json=data,
-            timeout=TIMEOUT
-        )
-
+        response = requests.post("http://users-service:5000/users", json=data, timeout=TIMEOUT)
+        fin = time.time()
+        print("[GATEWAY] Usuario creado correctamente - 200", flush=True)
+        print(f"[INFO] Tiempo que tardó el servicio de usuarios en crear el usuario con método POST fue: {fin-inicio}", flush=True)
+        fallos_users = 0
+        if estado_users == "HALF-OPEN":
+            print("Servicio de usuarios recuperado, se cierra el circuito", flush=True)
+        else:
+            print("Circuito cerrado en el servicio de usuarios", flush=True)
+        circuito_users = False
+        estado_users = "CLOSED"
         return jsonify(response.json())
 
     except requests.exceptions.Timeout:
-        return jsonify({
-            "error": "Timeout en users-service"
-        }), 504
+        fallos_users += 1
+        print(f"[ERROR] Fallo en servicio de usuarios, timeout, número de fallos: {fallos_users}", flush=True)
+        return jsonify({"error": "Timeout en users-service"}), 504 
 
     except:
-        return jsonify({
-            "error": "users-service no disponible"
-        }), 500
+        fallos_users += 1
+        print(f"[ERROR] Servicio de usuarios no disponible, errores: {fallos_users}", flush=True)
+        return jsonify({"error": "users-service no disponible"}), 503
 
-
-# TURNS - GET
 @app.route("/turns", methods=["GET"])
 def get_turns():
 
