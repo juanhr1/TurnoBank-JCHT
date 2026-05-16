@@ -27,11 +27,11 @@ def home():
         ]
     })
 
-# USERS - GET
 @app.route("/users", methods=["GET"])
 def get_users():
     global fallos_users, circuito_users, estado_users, tiempo_apertura_users
-
+    inicio = time.time()
+    print("[GATEWAY] Consultando servicio users", flush=True)
     if circuito_users:
         tiempo_actual = time.time()
         if tiempo_actual - tiempo_apertura_users >= tiempo_espera:
@@ -45,6 +45,9 @@ def get_users():
 
     try:
         response = requests.get("http://users-service:5000/users", timeout=TIMEOUT)
+        fin = time.time()
+        print("[GATEWAY] Servicio users funcionando correctamente - 200", flush=True)
+        print(f"[INFO] Tiempo users GET: {fin-inicio}", flush=True)
         fallos_users = 0
         if estado_users == "HALF-OPEN":
             print("Servicio users recuperado, se cierra el circuito", flush=True)
@@ -56,7 +59,7 @@ def get_users():
 
     except:
         fallos_users += 1
-        print(f"Fallo users número {fallos_users}", flush=True)
+        print(f"[ERROR] Fallo users número {fallos_users}", flush=True)
         if estado_users == "HALF-OPEN":
             circuito_users = True
             estado_users = "OPEN"
